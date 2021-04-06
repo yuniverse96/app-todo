@@ -11,6 +11,7 @@ const {height, width} = Dimensions.get("window");
 
 
 export default class App extends React.Component{
+
   state = {
     newTodo: "",
     loadedToDos: false,
@@ -20,6 +21,7 @@ export default class App extends React.Component{
   componentDidMount = () => {
     this._loadToDos();
   }
+
 
   render() {
     const {newTodo, loadedToDos, toDos} = this.state;
@@ -51,6 +53,7 @@ export default class App extends React.Component{
             deleteTodo ={this._deleteToDo}
             uncompleteToDo ={this._uncompleteToDo}
             completeToDo = {this._completeToDo}
+            updateToDo = {this._updateToDo}
             {...toDo}/>)}
           </ScrollView>
           
@@ -117,6 +120,25 @@ export default class App extends React.Component{
 
       return {...newState};
     });
+
+  };
+
+  _updateToDo = (id, text) => {
+    this.setState( prevState => {
+      const newState = {
+        ...prevState,
+        toDos: {
+          ...prevState.toDos,
+          [id]: {
+            ...prevState.toDos[id],
+            text: text
+          }
+        }
+      }
+
+      return {...newState};
+    });
+
 
   }
 
