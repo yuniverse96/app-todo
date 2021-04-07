@@ -1,6 +1,7 @@
 import React from 'react';
 import AppLoading from 'expo-app-loading';
-import { StyleSheet, Text, View, StatusBar, TextInput, Dimensions, Platform, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, StatusBar, TextInput, Dimensions, Platform, ScrollView} from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 import ToDo from "./ToDo";
 import { v1 as uuidv1 } from 'react-native-uuid';
 
@@ -68,11 +69,6 @@ export default class App extends React.Component{
     });
   };
 
-  _loadToDos = () => {
-    this.setState ({
-      loadedToDos: true
-    });
-  };
 
   _deleteToDo = (id) => {
     this.setState( prevState => {
@@ -82,7 +78,7 @@ export default class App extends React.Component{
         ...prevState,
         ...toDos
       };
-
+      this._saveToDos(newState.toDos);
       return{...newState};
 
     });
@@ -100,7 +96,7 @@ export default class App extends React.Component{
           }
         }
       }
-
+      this._saveToDos(newState.toDos);
       return {...newState};
     });
   };
@@ -117,7 +113,7 @@ export default class App extends React.Component{
           }
         }
       }
-
+      this._saveToDos(newState.toDos);
       return {...newState};
     });
 
@@ -135,12 +131,30 @@ export default class App extends React.Component{
           }
         }
       }
-
+ 
       return {...newState};
     });
 
-
   }
+
+  _loadToDos = async () => {
+    try{
+      const toDos = await AsyncStorage.getItem("toDos");
+      const parsedToDos = JSON.parse(toDos);
+      this.setState({
+        loadedToDos: true,
+        toDos: parsedToDos || {}
+      });
+    }catch(err){
+      console.log(err);
+    }
+  }
+  
+  _saveToDos = (newToDos) => {
+    const saveToDos = AsyncStorage.setItem("toDos", JSON.stringify(newToDos));
+    
+  }
+
 
   _addToDo = () => {
     const{newTodo} =this.state;
@@ -167,7 +181,7 @@ export default class App extends React.Component{
             ...newToDoObject
           }
         }
-
+        this._saveToDos(newState.toDos);
         return {...newState}
 
       });
